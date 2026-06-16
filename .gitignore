@@ -1,2 +1,28 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Environment variables
 .env
-node_modules
+.env.*
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.tfplan
+
+# SSH Keys
+*.pem
+*.ppk
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ansible
+*.retry

@@ -1,0 +1,57 @@
+---
+- hosts: todo_server
+  become: yes
+
+  vars:
+    remote_user: "{{ ansible_user }}"
+
+  tasks:
+    - name: Install Docker
+      dnf:
+        name: docker
+        state: present
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add remote-user to docker group
+      user:
+        name: "{{ remote_user }}"
+        groups: docker
+        append: yes
+
+    - name: Create docker cli plugins directory
+      file:
+        path: "/home/{{ remote_user }}/.docker/cli-plugins"
+        state: directory
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: '0755'
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+        dest: "/home/{{ remote_user }}/.docker/cli-plugins/docker-compose"
+        mode: '0755'
+
+    - name: Generate docker-compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: "/home/{{ remote_user }}/docker-compose.yml"
+        owner: "{{ remote_user }}"
+        group: "{{ remote_user }}"
+        mode: '0644'
+
+    - name: Stop existing containers
+      command: docker compose down
+      args:
+        chdir: "/home/{{ remote_user }}"
+      ignore_errors: yes
+
+    - name: Start application
+      command: docker compose up -d --pull always
+      args:
+        chdir: "/home/{{ remote_user }}"
