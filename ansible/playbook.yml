@@ -34,7 +34,7 @@
     - name: Install Docker Compose
       get_url:
         url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
-        dest: "/home/{{ remote_user }}/.docker/cli-plugins/docker-compose"
+        dest: /usr/local/bin/docker-compose
         mode: '0755'
 
     - name: Generate docker-compose file
@@ -46,12 +46,12 @@
         mode: '0644'
 
     - name: Stop existing containers
-      command: docker compose down
+      command: docker-compose down
       args:
         chdir: "/home/{{ remote_user }}"
       ignore_errors: yes
 
     - name: Start application
-      command: docker compose up -d --pull always
+      command: docker-compose up -d --pull always
       args:
         chdir: "/home/{{ remote_user }}"
